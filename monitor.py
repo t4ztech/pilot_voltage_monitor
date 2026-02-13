@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from dataclasses import dataclass
+
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 import argparse
@@ -9,6 +10,8 @@ import json
 import random
 import statistics
 import sys
+import hashlib
+VERSION = "1.0.0"
 
 
 @dataclass
@@ -106,6 +109,35 @@ def write_outputs(alerts, summary, out_dir: Path):
     print(f"✅ Wrote: {alerts_path}")
     print(f"✅ Wrote: {summary_path}")
 
+    def sha256_file(path: Path) -> str:
+        h = hashlib.sha256()
+        with path.open("rb") as f:
+             for chunk in iter(lambda: f.read(8192), b""):
+                 h.update(chunk)
+        return h.hexdigest()
+
+
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_run_metadata(out_dir: Path, mode: str, input_hash: str) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    meta = {
+        "version": VERSION,
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "input_hash": input_hash,
+        "mode": mode,
+    }
+
+    meta_path = out_dir / "run_metadata.json"
+    with meta_path.open("w") as f:
+        json.dump(meta, f, indent=2)
+
+    print(f"✅ Wrote: {meta_path}")
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Independent Voltage Monitor")
@@ -119,15 +151,22 @@ def main():
     thresholds = Thresholds()
 
     if args.simulate:
+        mode = "simulate"
+        input_hash = sha256_text(f"simulate:{args.minutes}")
         samples = simulate_data(args.minutes)
     elif args.csv:
+        mode = "csv"
+        input_hash = sha256_file(args.csv)
         samples = load_csv(args.csv)
     else:
         print("❌ Either --simulate or --csv is required")
         sys.exit(1)
 
+
     alerts, summary = analyze(samples, thresholds)
     write_outputs(alerts, summary, args.out)
+    write_run_metadata(args.out, mode, input_hash)
+
 
 
 if __name__ == "__main__":
