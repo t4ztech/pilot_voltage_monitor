@@ -1,0 +1,33 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 T4ZM4N1J4K
+All rights reserved.
+
+This software and accompanying documentation are proprietary and confidential.
+
+PERMITTED USE
+The software is licensed, not sold.
+The licensee is granted a non-exclusive, non-transferable right to use the
+software solely for internal monitoring and diagnostic purposes.
+
+RESTRICTIONS
+The licensee may NOT:
+- copy, reproduce, or distribute the software or documentation
+- modify, reverse engineer, decompile, or disassemble the software
+- sublicense, lease, sell, or transfer the software to third parties
+- use the software as part of a competing product or service
+
+INTELLECTUAL PROPERTY
+All intellectual property rights, including source code, algorithms,
+configuration logic, and documentation, remain the exclusive property
+of the author.
+
+NO WARRANTY
+The software is provided “as is”, without warranty of any kind.
+
+LIMITATION OF LIABILITY
+In no event shall the author be liable for any damages arising from the
+use of this software.
+
+GOVERNING PRINCIPLE
+Safety systems and operational authority always take precedence over this software.

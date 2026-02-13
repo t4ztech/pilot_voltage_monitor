@@ -1,0 +1,25 @@
+
+SCOPE OF WORK — VOLTAGE OBSERVABILITY PILOT
+
+IN SCOPE
+- Read-only monitoring of voltage behavior
+- Analysis of historical and simulated measurement data
+- Detection of abnormal patterns and trends
+- Software-based alerts and summary reports
+- Interpretation of results and recommendations
+
+OUT OF SCOPE
+- Any form of control or actuation
+- Modifications to PLC logic or configuration
+- Interaction with safety or protection systems
+- Responsibility for physical damage or equipment failure
+- Real-time operational decision-making
+
+AUTHORITIES
+- Safety systems retain the highest authority
+- PLC logic remains deterministic and unchanged
+- Monitoring software has advisory status only
+DESIGN PRINCIPLE
+Observation precedes intervention.
+Safety precedes automation.
+

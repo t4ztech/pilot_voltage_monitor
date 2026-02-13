@@ -1,0 +1,28 @@
+DISCLAIMER — DECISION SUPPORT ONLY
+
+This software is provided as a diagnostic and decision-support tool only.
+
+The system:
+- operates in read-only mode
+- does not perform any control or actuation
+- does not modify PLC logic, safety systems, or real-time processes
+
+All outputs (alerts, reports, summaries, recommendations) are intended to
+support human decision-making and operational awareness.
+
+The system owner and operators remain fully responsible for:
+- interpretation of results
+- operational decisions
+- physical interventions
+- safety and protection of personnel and equipment
+
+This software does not replace certified protection systems, safety relays,
+PLC interlocks, alarms, or regulatory compliance requirements.
+
+No guarantee is made that all faults, failures, or unsafe conditions will be
+detected.
+
+Use of this software implies acceptance that:
+- it provides insight, not authority
+- safety systems retain the highest level of control
+- final responsibility remains with the operator or asset owner
