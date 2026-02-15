@@ -69,12 +69,13 @@ def load_csv(path: Path):
     return samples
 
 
-def analyze(samples, thresholds: Thresholds):
+def analyze(samples, thresholds: Thresholds, drift: bool = False):
     alerts = []
     voltages = []
 
     # DRIFT v1: detect step changes between consecutive samples
-    for i in range(1, len(samples)):
+    if drift:
+    	for i in range(1, len(samples)):
             delta = samples[i].voltage - samples[i - 1].voltage
             if delta >= 1.0:
                     alerts.append(Alert(samples[i].timestamp, samples[i].voltage, "WARN", "DRIFT_UP"))
@@ -173,6 +174,7 @@ def main():
     parser.add_argument("--csv", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--config", type=Path, help="JSON file to override thresholds")
+    parser.add_argument("--drift", action="store_true", help="Enable DRIFT step detection")
 
     args = parser.parse_args()
     thresholds = Thresholds()
@@ -191,7 +193,7 @@ def main():
         print("❌ Either --simulate or --csv is required")
         sys.exit(1)
 
-    alerts, summary = analyze(samples, thresholds)
+    alerts, summary = analyze(samples, thresholds, drift=args.drift)
     write_outputs(alerts, summary, args.out)
     write_run_metadata(args.out, mode, input_hash)
 
