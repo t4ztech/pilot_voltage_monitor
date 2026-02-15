@@ -7,3 +7,4 @@ v1_release/
 # release test outputs
 output_release_sim/
 output_release_csv/
+drift_test/
