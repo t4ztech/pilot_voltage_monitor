@@ -69,7 +69,7 @@ def load_csv(path: Path):
     return samples
 
 
-def analyze(samples, thresholds: Thresholds, drift: bool = False):
+def analyze(samples, thresholds: Thresholds, drift: bool = False, drift_threshold: float = 2.0):
     alerts = []
     voltages = []
 
@@ -77,9 +77,9 @@ def analyze(samples, thresholds: Thresholds, drift: bool = False):
     if drift:
     	for i in range(1, len(samples)):
             delta = samples[i].voltage - samples[i - 1].voltage
-            if delta >= 1.0:
+            if delta >= drift_threshold:
                     alerts.append(Alert(samples[i].timestamp, samples[i].voltage, "WARN", "DRIFT_UP"))
-            elif delta <= -1.0:
+            elif delta <= -drift_threshold:
                     alerts.append(Alert(samples[i].timestamp, samples[i].voltage, "WARN", "DRIFT_DOWN"))
 
 
@@ -175,6 +175,12 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--config", type=Path, help="JSON file to override thresholds")
     parser.add_argument("--drift", action="store_true", help="Enable DRIFT step detection")
+    parser.add_argument(
+        "--drift-threshold",
+        type=float,
+        default=2.0,
+        help="DRIFT threshold in volts (default: 2.0)",
+    )
 
     args = parser.parse_args()
     thresholds = Thresholds()
