@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from dataclasses import dataclass
-
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 import argparse
@@ -11,7 +10,8 @@ import random
 import statistics
 import sys
 import hashlib
-VERSION = "1.0.0"
+
+VERSION = "1.1.0"
 
 
 @dataclass
@@ -56,7 +56,7 @@ def simulate_data(minutes: int):
         if random.random() < 0.02:
             noise += random.choice([-25, 25])
 
-        samples.append(Sample(ts.isoformat() + "Z", base + noise))
+        samples.append(Sample(ts.isoformat().replace("+00:00", "Z"), base + noise))
     return samples
 
 
@@ -93,7 +93,7 @@ def analyze(samples, thresholds: Thresholds):
     return alerts, summary
 
 
-def write_outputs(alerts, summary, out_dir: Path):
+def write_outputs(alerts, summary,      out_dir: Path):
     out_dir.mkdir(parents=True, exist_ok=True)
 
     alerts_path = out_dir / "alerts.log"
@@ -109,17 +109,33 @@ def write_outputs(alerts, summary, out_dir: Path):
     print(f"✅ Wrote: {alerts_path}")
     print(f"✅ Wrote: {summary_path}")
 
-    def sha256_file(path: Path) -> str:
-        h = hashlib.sha256()
-        with path.open("rb") as f:
-             for chunk in iter(lambda: f.read(8192), b""):
-                 h.update(chunk)
-        return h.hexdigest()
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
+def load_thresholds_config(path: Path, base: Thresholds) -> Thresholds:
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    allowed = {"ok_min", "ok_max", "alarm_min", "alarm_max"}
+
+    for key in data:
+        if key not in allowed:
+            raise ValueError(f"Unknown threshold key: {key}")
+
+    for key in allowed:
+        if key in data:
+            setattr(base, key, float(data[key]))
+
+    return base
 
 def write_run_metadata(out_dir: Path, mode: str, input_hash: str) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -138,17 +154,18 @@ def write_run_metadata(out_dir: Path, mode: str, input_hash: str) -> None:
     print(f"✅ Wrote: {meta_path}")
 
 
-
 def main():
     parser = argparse.ArgumentParser(description="Independent Voltage Monitor")
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--minutes", type=int, default=2)
     parser.add_argument("--csv", type=Path)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--config", type=Path, help="JSON file to override thresholds")
 
     args = parser.parse_args()
-
     thresholds = Thresholds()
+    if args.config:
+        thresholds = load_thresholds_config(args.config, thresholds)
 
     if args.simulate:
         mode = "simulate"
@@ -162,11 +179,9 @@ def main():
         print("❌ Either --simulate or --csv is required")
         sys.exit(1)
 
-
     alerts, summary = analyze(samples, thresholds)
     write_outputs(alerts, summary, args.out)
     write_run_metadata(args.out, mode, input_hash)
-
 
 
 if __name__ == "__main__":
