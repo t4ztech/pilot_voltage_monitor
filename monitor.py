@@ -73,6 +73,16 @@ def analyze(samples, thresholds: Thresholds):
     alerts = []
     voltages = []
 
+    # DRIFT v1: detect step changes between consecutive samples
+    for i in range(1, len(samples)):
+            delta = samples[i].voltage - samples[i - 1].voltage
+            if delta >= 1.0:
+                    alerts.append(Alert(samples[i].timestamp, samples[i].voltage, "WARN", "DRIFT_UP"))
+            elif delta <= -1.0:
+                    alerts.append(Alert(samples[i].timestamp, samples[i].voltage, "WARN", "DRIFT_DOWN"))
+
+
+
     for s in samples:
         voltages.append(s.voltage)
         level, reason = classify_voltage(s.voltage, thresholds)
@@ -93,21 +103,23 @@ def analyze(samples, thresholds: Thresholds):
     return alerts, summary
 
 
-def write_outputs(alerts, summary,      out_dir: Path):
+def write_outputs(alerts, summary, out_dir: Path):
+    alerts = sorted(alerts, key=lambda a: a.timestamp)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     alerts_path = out_dir / "alerts.log"
     summary_path = out_dir / "summary.json"
 
-    with alerts_path.open("w") as f:
+    with alerts_path.open("w", encoding="utf-8") as f:
         for a in alerts:
             f.write(f"{a.timestamp} | {a.level} | {a.voltage:.2f}V | {a.reason}\n")
 
-    with summary_path.open("w") as f:
+    with summary_path.open("w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
     print(f"✅ Wrote: {alerts_path}")
     print(f"✅ Wrote: {summary_path}")
+
 
 
 def sha256_file(path: Path) -> str:
