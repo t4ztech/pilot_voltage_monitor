@@ -1,83 +1,52 @@
-# Independent 230V Voltage Observability — Pilot
+# Voltage Observability Monitor (230V RMS) — CLI Analysis Utility
 
-## Purpose
-This pilot provides independent, read-only monitoring of a 230V power supply
-to detect early signs of instability before failures occur.
+A small, read-only command-line tool for offline analysis of 230V RMS voltage data.  
+It detects threshold violations (WARN/ALARM) and optional step-based drift, then produces structured logs and summaries for troubleshooting and validation.
 
-The system does NOT control equipment, modify PLC logic, or interact with
-safety functions. It exists solely to observe, analyze, and report.
+## Why this exists
 
+Voltage instability can cause:
+- sporadic electronic faults and resets
+- nuisance alarms during downtime/startup
+- missing context when commissioning or diagnosing issues
+
+This tool provides independent observability **without changing PLC logic**.
+
+## Features
+
+- CSV analysis (`--csv`) or synthetic simulation (`--simulate`)
+- WARN / ALARM classification using thresholds
+- Optional DRIFT detection (`--drift`, `--drift-threshold`)
+- Outputs:
+  - `alerts.log` (chronological events)
+  - `summary.json` (stats + counts)
+  - `run_metadata.json` (run context + SHA256 integrity hash)
+
+## Usage
+
+### Simulated run
+```bash
+python monitor.py --simulate --minutes 1 --out output_sim
+
+python monitor.py --simulate --minutes 1 --drift --out output_sim
+
+python monitor.py --simulate --minutes 1 --drift --drift-threshold 3.0 --out output_sim
+
+python monitor.py --csv sample_data/voltage_sample.csv --out output_csv
+
+Roadmap (Phase 4 ideas)
+
+rolling window trends (moving average / min / max)
+
+drift accumulation and “slow decay” detection
+
+noise profiling / variance metrics
+
+config profiles via JSON (threshold sets)
+
+export format suitable for dashboards
+
+Author
+
+Electrical field technician transitioning into software/automation, focusing on practical observability tooling for real industrial environments.
 ---
-
-## Problem Addressed
-Intermittent voltage instability can cause:
-- unexplained equipment resets
-- sporadic electronic faults
-- alarms that trigger only after downtime has occurred
-
-Traditional systems often react too late and without historical context.
-
----
-
-## What This Pilot Does
-- Monitors RMS voltage behavior over time
-- Detects drift, noise, spikes, and data dropouts
-- Differentiates between normal, warning, and alarm states
-- Generates alerts and summary reports
-
----
-
-## What This Pilot Does NOT Do
-- No real-time control
-- No PLC program changes
-- No interaction with safety systems
-- No automatic corrective actions
-
-Safety systems retain full authority.
-
----
-
-## Deliverables
-- alerts.log — timestamped event log
-- summary.json — statistical summary and counts
-- Interpretation and recommendations
-
----
-
-## Design Principle
-"I don’t build smarter control systems.
-I build systems that understand themselves before they fail."
-
----
-
-## Typical Pilot Duration
-2–4 weeks, depending on data availability.
-
----
-
-## Design Principle
-"I don’t build smarter control systems.
-I build systems that understand themselves before they fail."
-
----
-
-## Typical Pilot Duration
-2–4 weeks, depending on data availability and system behavior.
-
----
-
-## Next Steps
-If value is demonstrated, the system can:
-- remain active as a monitoring service
-- be extended with additional signals
-- be integrated into regular operational reporting
-
----
-
-
-## Quick Start
-Simulated run:
-`python3 monitor.py --simulate --minutes 2 --out output_example`
-
-CSV run:
-`python3 monitor.py --csv sample_data/voltage_sample.csv --out output_example`
