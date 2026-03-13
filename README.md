@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![CLI Tool](https://img.shields.io/badge/Tool-CLI-lightgrey)
+![Status](https://img.shields.io/badge/Status-Active-success)
+
 # Voltage Observability Monitor (230V RMS) — CLI Analysis Utility
 
 A lightweight command-line diagnostic utility for analysing 230V RMS voltage behaviour and identifying instability patterns in electrical and industrial environments.
