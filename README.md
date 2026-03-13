@@ -22,24 +22,21 @@ This tool provides independent observability **without changing PLC logic**.
   - `summary.json` (stats + counts)
   - `run_metadata.json` (run context + SHA256 integrity hash)
 
-## Architecture Overview
 
 The utility follows a simple diagnostic pipeline for analysing voltage behaviour.
 
 ```text
-Data Source
-   │
-   ├─ CSV input file
-   └─ Simulation generator
-        │
-        ▼
-Voltage Analysis Engine
-        │
-        ├─ Threshold detection (WARN / ALARM)
-        └─ Drift detection
-        │
-        ▼
-Structured Output
-   ├─ alerts.log
-   ├─ summary.json
-   └─ run_metadata.json
+```mermaid
+flowchart LR
+    A[CSV Input] --> B[Voltage Analysis Engine]
+    C[Simulation Generator] --> B
+
+    B --> D[Threshold Detection]
+    B --> E[Drift Detection]
+
+    D --> F[alerts.log]
+    E --> F
+
+    B --> G[summary.json]
+    B --> H[run_metadata.json]
+```
