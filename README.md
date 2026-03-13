@@ -1,5 +1,7 @@
 # Voltage Observability Monitor (230V RMS) — CLI Analysis Utility
 
+A lightweight command-line diagnostic utility for analysing 230V RMS voltage behaviour and identifying instability patterns in electrical and industrial environments.
+
 A small, read-only command-line tool for offline analysis of 230V RMS voltage data.  
 It detects threshold violations (WARN/ALARM) and optional step-based drift, then produces structured logs and summaries for troubleshooting and validation.
 
@@ -25,7 +27,6 @@ This tool provides independent observability **without changing PLC logic**.
 
 The utility follows a simple diagnostic pipeline for analysing voltage behaviour.
 
-```text
 ```mermaid
 flowchart LR
     A[CSV Input] --> B[Voltage Analysis Engine]
@@ -40,3 +41,16 @@ flowchart LR
     B --> G[summary.json]
     B --> H[run_metadata.json]
 ```
+## Example CLI Output
+
+Example simulated run:
+
+```bash
+python3 monitor.py --simulate --minutes 1 --drift --out output_test
+```
+
+Output files generated:
+
+- alerts.log
+- summary.json
+- run_metadata.json
